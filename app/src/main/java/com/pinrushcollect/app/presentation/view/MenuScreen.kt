@@ -107,14 +107,14 @@ fun DifficultySelectionScreen(
                             painterResourceId = R.drawable.app_btn_hard,
                             levelKey = Prefs.LEVEL_HARD,
                             contentDescription = "Hard Button",
-                            levelCost = 20, // Стоимость сложного уровня
+                            levelCost = 2000, // Стоимость сложного уровня
                             isLocked = !Prefs.isLevelUnlocked(Prefs.LEVEL_HARD)
                         ),
                         LevelData(
                             painterResourceId = R.drawable.app_btn_extreme,
                             levelKey = Prefs.LEVEL_EXTREME,
                             contentDescription = "Extreme Button",
-                            levelCost = 30, // Стоимость экстремального уровня
+                            levelCost = 3000, // Стоимость экстремального уровня
                             isLocked = !Prefs.isLevelUnlocked(Prefs.LEVEL_EXTREME)
                         )
                     )
