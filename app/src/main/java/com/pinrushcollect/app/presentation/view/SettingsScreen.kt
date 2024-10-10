@@ -28,7 +28,7 @@ import com.pinrushcollect.app.R
 
 
 @Composable
-fun SettingsScreen(onNext: (Screen) -> Unit,navController: NavHostController) {
+fun SettingsScreen(onNext: (Screen) -> Unit, navController: NavHostController) {
     val context = LocalContext.current
     BackHandler {
 
@@ -60,7 +60,17 @@ fun SettingsScreen(onNext: (Screen) -> Unit,navController: NavHostController) {
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .size(300.dp, 40.dp)
-                    .clickable { /* TODO: Handle click */ }
+                    .clickable {
+                        val shareIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            val appPackageName = context.packageName  // Dynamically get package name
+                            val shareText = "Check out this app: https://play.google.com/store/apps/details?id=$appPackageName"
+                            putExtra(Intent.EXTRA_TEXT, shareText)
+                            type = "text/plain"
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, "Share via"))
+
+                    }
             )
             // Contact Us button
             Image(
