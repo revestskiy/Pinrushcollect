@@ -1,8 +1,5 @@
 package com.pinrushcollect.app.domain
 
-import androidx.annotation.DrawableRes
-import com.pinrushcollect.app.R
-
 
 //data class Level(
 //  //  val difficulty: Difficulty,

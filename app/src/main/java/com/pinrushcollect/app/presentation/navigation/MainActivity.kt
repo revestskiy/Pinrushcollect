@@ -15,14 +15,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.invisibleToUser
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextLayoutResult
@@ -43,7 +40,9 @@ import androidx.navigation.navArgument
 import com.ancient.flow.game.presentation.navigation.Screen
 import com.ancient.flow.game.presentation.navigation.navigatePopUpInclusive
 import com.ancient.flow.game.presentation.navigation.navigateSingleTop
-import com.pinrushcollect.app.R
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.pinrushcollect.app.data.Prefs
 import com.pinrushcollect.app.presentation.view.DailyBonusScreen
 import com.pinrushcollect.app.presentation.view.DifficultySelectionScreen
@@ -52,12 +51,15 @@ import com.pinrushcollect.app.presentation.view.InformationScreen
 import com.pinrushcollect.app.presentation.view.LevelPurchaseScreen
 import com.pinrushcollect.app.presentation.view.LoseScreen
 import com.pinrushcollect.app.presentation.view.SettingsScreen
+import com.pinrushcollect.app.presentation.view.WInfoScreen
 import com.pinrushcollect.app.presentation.view.WelcomeBonusScreen
 import com.pinrushcollect.app.presentation.view.WinScreen
 import com.pinrushcollect.app.presentation.viewModel.DailyBonusManager
 import com.pinrushcollect.app.ui.theme.PinrushcollectTheme
 import com.pinrushcollect.app.ui.theme.myfont
 import kotlinx.coroutines.delay
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -131,11 +133,19 @@ fun OutlinedText(
 
 
 class MainActivity : ComponentActivity() {
+    private val remoteConfig by lazy {
+        Firebase.remoteConfig
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Prefs.init(applicationContext)
-        Prefs.init(this)
         val bonusManager = DailyBonusManager(applicationContext)
+        val settings =
+            FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(3600)
+                .build()
+        remoteConfig.setConfigSettingsAsync(settings)
+
         setContent {
             PinrushcollectTheme {
                 val navController = rememberNavController()
@@ -145,9 +155,28 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable(Screen.SplashScreen.route) {
                         LoadingScreen(
-                            navController::navigatePopUpInclusive, bonusManager
+                            { getUrlFromConfig(
+                                launchPlaceholder = {
+                                    navController.navigatePopUpInclusive(it)
+                                },
+                                setWebView = { link ->
+                                    navController.navigateSingleTop(Screen.WebView.route.replace(
+                                        "{url}",
+                                        URLEncoder.encode(link, "UTF-8")
+                                    ))
+                                }
+                            )
+                            },
+                            bonusManager
                         )
+                    }
 
+                    composable(Screen.WebView.route) {
+                        val url = it.arguments?.getString("url")?.let {
+                            URLDecoder.decode(it, "UTF-8")
+                        }
+
+                        WInfoScreen(url!!)
                     }
 
 
@@ -247,6 +276,30 @@ class MainActivity : ComponentActivity() {
 
                 }
             }
+        }
+    }
+    private fun getUrlFromConfig(
+        launchPlaceholder: () -> Unit,
+        setWebView: (String) -> Unit
+    ) {
+        try {
+            remoteConfig.fetchAndActivate().addOnCompleteListener(this) {
+                if (it.isSuccessful) {
+                    val url = remoteConfig.getString("pinrush")
+                    if (url.isBlank()) {
+                        launchPlaceholder()
+                    }
+                    else {
+                        setWebView(url)
+                    }
+                }
+                else {
+                    launchPlaceholder()
+                }
+            }
+        }
+        catch (e: Exception) {
+            launchPlaceholder()
         }
     }
 }

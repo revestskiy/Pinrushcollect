@@ -1,7 +1,5 @@
 package com.ancient.flow.game.presentation.navigation
 
-import androidx.navigation.NavBackStackEntry
-
 
 sealed class Screen(
     val screenRoute: String,
@@ -31,6 +29,7 @@ sealed class Screen(
     }
     data object WinScreen : Screen("win_screen/{level}")
     data object LoseScreen : Screen("lose_screen/{level}")
+    data object WebView: Screen("web_view/{url}")
 
 
 }

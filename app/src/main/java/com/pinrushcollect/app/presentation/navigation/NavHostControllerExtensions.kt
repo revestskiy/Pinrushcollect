@@ -18,13 +18,16 @@ fun NavHostController.navigateSingleTop(
     }
 }
 
-fun NavHostController.navigatePopUpInclusive(screen: Screen) {
+fun NavHostController.navigatePopUpInclusive(
+    screen: Screen,
+    builder: NavOptionsBuilder.() -> Unit = {}  // Optional navigation options
+) {
     val currentRoute = currentBackStackEntry?.destination?.route ?: return
     navigate(screen.route) {
         popUpTo(currentRoute) {
             inclusive = true
-
         }
+        builder(this)
     }
 }
 
