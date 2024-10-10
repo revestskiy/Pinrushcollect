@@ -39,7 +39,6 @@ import com.pinrushcollect.app.R
 import com.pinrushcollect.app.data.Prefs
 import com.pinrushcollect.app.presentation.navigation.OutlinedText
 import com.pinrushcollect.app.presentation.viewModel.DailyBonusManager
-import kotlinx.coroutines.delay
 
 
 //@Composable

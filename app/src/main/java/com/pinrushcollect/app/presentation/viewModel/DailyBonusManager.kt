@@ -2,7 +2,7 @@ package com.pinrushcollect.app.presentation.viewModel
 
 import android.content.Context
 import android.content.SharedPreferences
-import java.util.*
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 class DailyBonusManager(context: Context) {
