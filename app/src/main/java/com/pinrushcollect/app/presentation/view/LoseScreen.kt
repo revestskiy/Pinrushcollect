@@ -1,5 +1,6 @@
-package com.pinrushcollect.app
+package com.pinrushcollect.app.presentation.view
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,15 +12,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.ancient.flow.game.presentation.navigation.Screen
+import com.ancient.flow.game.presentation.navigation.navigateSingleTop
+import com.pinrushcollect.app.R
 
-@Preview
+
 @Composable
-fun LoseScreen() {
+fun LoseScreen(onRestart: () -> Unit,navController: NavHostController) {
+    BackHandler {
+        navController.navigateSingleTop(Screen.LevelScreen.route)
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .paint(
-                painter = painterResource(id = R.drawable.app_ic_light),
+                painter = painterResource(id = R.drawable.app_bg_main),
                 contentScale = ContentScale.Crop
             )
     ) {
@@ -50,7 +58,7 @@ fun LoseScreen() {
                     modifier = Modifier
                         .padding(end = 32.dp)
                         .size(40.dp)
-                        .clickable { /* TODO: Handle click */ }
+                        .clickable { navController.navigateSingleTop(Screen.LevelScreen.route) }
                 )
                 // Next button
                 Image(
@@ -58,7 +66,7 @@ fun LoseScreen() {
                     contentDescription = "Next Button",
                     modifier = Modifier
                         .size(100.dp, 40.dp)
-                        .clickable { /* TODO: Handle click */ }
+                        .clickable { onRestart() }
                 )
             }
         }
